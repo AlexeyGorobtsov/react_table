@@ -14,6 +14,8 @@ class Tbody extends Component {
         this._save = this._save.bind(this);
         this._toggleSearch = this._toggleSearch.bind(this);
         this._search = this._search.bind(this);
+        this._replay = this._replay.bind(this);
+        this._log = [];
         console.log(this);
     }
     getInitialState() {
@@ -29,7 +31,7 @@ class Tbody extends Component {
     _showEditor(e) {
         // console.log('row', parseInt(e.target.dataset.row, 10))
         // console.log('cell', e.target.cellIndex,)
-        this.setState({
+        this._logSetState({
             edit: {
                 row: parseInt(e.target.dataset.row, 10),
                 cell: e.target.cellIndex,
@@ -53,7 +55,7 @@ class Tbody extends Component {
                 : (a[column] > b[column] ? 1 : -1);
 
         });
-        this.setState({
+        this._logSetState({
             data: data,
             sortby: column,
             descending: descending,
@@ -71,7 +73,7 @@ class Tbody extends Component {
         // console.log('this.state.edit.cell',this.state.edit.cell)
         // console.log('data_change', data[this.state.edit.row][this.state.edit.cell])
         data[this.state.edit.row][this.state.edit.cell] = input.value;
-        this.setState({
+        this._logSetState({
             edit: null,
             data: data,
         });
@@ -85,6 +87,82 @@ class Tbody extends Component {
             <tr onChange={this._search}>
                 {this.props.headers.map((_ignore, idx) => <td key={idx}><input type='text' data-idx={idx}/></td>)}
             </tr>
+        );
+    }
+
+    _toggleSearch() {
+        // console.log(this)
+        if (this.state.search) {
+            this.setState({
+                data: this._preSearchData,
+                search: false,
+            });
+            this._preSearchData = null;
+        } else {
+            this._preSearchData = this.state.data;
+            this.setState({
+                search: true,
+            });
+        }
+    }
+
+    _search(e) {
+        const needle = e.target.value.toLowerCase();
+        // console.log('neddle', needle);
+        if(!needle) {
+            this._logSetState({
+                data: this._preSearchData
+            });
+            return;
+        }
+        const idx = e.target.dataset.idx;
+        // console.log('idx', idx);
+        // console.log('this._preSearchData', this._preSearchData)
+        const searchdata = this._preSearchData.filter(row => {
+            return row[idx].toString().toLowerCase().indexOf(needle) > -1;
+        });
+        this._logSetState({data: searchdata});
+    }
+
+    _logSetState(newState) {
+        this._log.push(JSON.parse(JSON.stringify(
+            this._log.length === 0 ? this.state : newState
+        )));
+        this.setState(newState);
+    }
+
+    componentDidMount() {
+        document.onkeydown = function(e) {
+            if (e.altKey && e.shiftKey && e.keyCode === 82) {
+                this._replay();
+            }
+        }.bind(this);
+    }
+
+    _replay() {
+        console.log(this);
+        if (this._log.length === 0) {
+            console.warn('Состояние для проигрывания отсутствует');
+            return;
+        }
+        let idx = -1;
+        const interval = setInterval(function() {
+            idx++;
+            if (idx === this._log.length - 1) {
+                clearInterval(interval);
+            }
+            this.setState(this._log[idx]);
+        }.bind(this), 1000);
+    }
+
+    _renderToolbar() {
+        return(
+            <button
+                onClick={this._toggleSearch}
+                className={'toolbar'}
+            >
+                {this.state.search ? 'search in progress' : 'search'}
+            </button>
         );
     }
 
@@ -119,50 +197,6 @@ class Tbody extends Component {
             </table>
         );
     }
-
-    _toggleSearch() {
-        // console.log(this)
-        if (this.state.search) {
-            this.setState({
-                data: this._preSearchData,
-                search: false,
-            });
-            this._preSearchData = null;
-        } else {
-            this._preSearchData = this.state.data;
-            this.setState({
-                search: true,
-            });
-        }
-    }
-
-    _search(e) {
-        const needle = e.target.value.toLowerCase();
-        // console.log('neddle', needle);
-        if(!needle) {
-            this.setState({
-                data: this._preSearchData
-            });
-            return;
-        }
-        const idx = e.target.dataset.idx;
-        // console.log('idx', idx);
-        // console.log('this._preSearchData', this._preSearchData)
-        const searchdata = this._preSearchData.filter(row => {
-            return row[idx].toString().toLowerCase().indexOf(needle) > -1;
-        });
-        this.setState({data: searchdata});
-    }
-
-    _renderToolbar() {
-        return(
-            <button
-                onClick={this._toggleSearch}
-                className={'toolbar'}
-            >search</button>
-        );
-    }
-
     render() {
         return(
             <div>
