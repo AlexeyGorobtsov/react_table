@@ -155,14 +155,48 @@ class Tbody extends Component {
         }.bind(this), 1000);
     }
 
+    _download(format, ev) {
+        let contents = format === 'json'
+            ? JSON.stringify(this.state.data)
+            : this.state.data.reduce((result, row) => {
+                return result
+                + row.reduce((rowresult, cell, idx) => {
+                    console.log('rowresult', rowresult);
+                    return rowresult
+                        + '"'
+                        + cell.replace(/"/g, '""')
+                        +'"'
+                        + (idx < row.length - 1 ? ',' : '');
+                }, '')
+                + '\n';
+            }, '');
+        const URL = window.URL || window.webkitURL;
+        const blob = new Blob([contents], {type: 'text/' + format});
+        ev.target.href = URL.createObjectURL(blob);
+        ev.target.download = 'data.' + format;
+    }
+
     _renderToolbar() {
         return(
-            <button
-                onClick={this._toggleSearch}
-                className={'toolbar'}
-            >
-                {this.state.search ? 'search in progress' : 'search'}
-            </button>
+            <div>
+                <button
+                    onClick={this._toggleSearch}
+                    className={'toolbar'}
+                >
+                    {this.state.search ? 'search in progress' : 'search'}
+                </button>
+                <a
+                    href="data.json"
+                    onClick={this._download.bind(this, 'json')}
+                >
+                    Export JSON
+                </a>
+                <a onClick={this._download.bind(this, 'csv')}
+                    href='data.csv'
+                >
+                    Export CSV
+                </a>
+            </div>
         );
     }
 
