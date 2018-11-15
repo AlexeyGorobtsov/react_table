@@ -10,17 +10,15 @@ class Thead extends Component {
         const {sort, descending, sortby} = this.props;
         return (
             <thead onClick={sort}>
-            <tr>
-                {this.props.headers.map((title, i) => <th key={i}>
-                    {(sortby === i) ?
-                        (title += descending ? ` \u2193` : ` \u2191`) : title
-                    }</th>)
-
-                }
-
-            </tr>
+                <tr>
+                    {this.props.headers.map((title, i) => <th key={i}>
+                        {(sortby === i) ?
+                            (title += descending ? ' \u2193' : ' \u2191') : title
+                        }</th>)
+                    }
+                </tr>
             </thead>
-        )
+        );
     }
 }
 

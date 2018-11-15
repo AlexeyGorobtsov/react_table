@@ -1,17 +1,20 @@
 import React, {Component} from 'react';
+import exelCss from './excel.css';
 import Thead from './Thead';
 import datafile from '../data';
 import Tbody from './Tbody';
 import Fancylink from './FancyLink';
-import gr from '../greeting';
+
+let headers = localStorage.getItem('headers');
+let data = localStorage.getItem('data');
+
+if(!headers) {
+    headers = datafile.headers;
+    data = datafile.data;
+}
 
 
-const {headers, data} = datafile;
 
-const attr = {
-    href: 'http://example.org',
-    target: '_blank',
-};
 
 
 class Excel extends Component {
@@ -34,32 +37,7 @@ class Excel extends Component {
     render() {
         // console.log('Excel', this);
         return (
-            <div className={'parent'}>
-                {/*{gr}*/}
-                {/*<textarea defaultValue={'hello\nworld'}*/}
-                {/*onChange={this.log}*/}
-                {/*></textarea>*/}
-                {/*<textarea onChange={this.log}*/}
-                {/*>hello*/}
-                {/*world</textarea>*/}
-                {/*<textarea onChange={this.log}*/}
-                {/*>*/}
-                {/*{'hello\nworld'}*/}
-                {/*</textarea>*/}
-                {/*<select defaultValue={'move'}>*/}
-                {/*<option value="stay">I stay</option>*/}
-                {/*<option value={'move'}>or should I go</option>*/}
-                {/*</select>*/}
-                <select defaultValue={['stay', 'move']} multiple={true}>
-                    <option value="stay">Should I stay</option>
-                    <option value="move">or should I go</option>
-                    <option value="trouble">If I stay it will be</option>
-                </select>
-                <input type="text"
-                    onChange={this.log}
-                    defaultValue={'hello'}
-                />
-                <Fancylink {...attr}>test</Fancylink>
+            <div className={'Excel'}>
                 <Tbody initialData={data} headers={headers}/>
             </div>
         );

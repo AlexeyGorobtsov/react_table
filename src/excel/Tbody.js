@@ -1,4 +1,10 @@
 import React, {Component} from 'react';
+import Actions from '../components/Actions';
+import Dialog from '../components/Dialog';
+import Form from '../components/Form';
+import FormInput from '../components/FormInput';
+import Rating from '../components/Rating';
+import classNames from 'classnames';
 import PropType from 'prop-types';
 import Thead from './Thead';
 import datafile from '../data';
@@ -8,7 +14,7 @@ class Tbody extends Component {
     constructor(props) {
         super(props);
         this._preSearchData = null;
-        this.state = {data: this.props.initialData};
+        // this.state = {data: this.props.initialData};
         this._sort = this._sort.bind(this);
         this._showEditor = this._showEditor.bind(this);
         this._save = this._save.bind(this);
@@ -16,67 +22,123 @@ class Tbody extends Component {
         this._search = this._search.bind(this);
         this._replay = this._replay.bind(this);
         this._log = [];
-        console.log(this);
-    }
-    getInitialState() {
-        return {
+        this.state = {
             data: this.props.initialData,
             sortby: null,
             descending: false,
             edit: null,
-            search: false,
+            dialog: null,
         };
+        console.log(this);
+    }
+    // getInitialState() {
+    //     return {
+    //         data: this.props.initialData,
+    //         sortby: null,
+    //         descending: false,
+    //         edit: null,
+    //         search: false,
+    //     };
+    // }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({ data: nextProps.initialData});
+    }
+
+    _fireDataChange(data) {
+        this.props.onDataChange(data);
     }
 
     _showEditor(e) {
         // console.log('row', parseInt(e.target.dataset.row, 10))
         // console.log('cell', e.target.cellIndex,)
-        this._logSetState({
+        this.setState({
             edit: {
                 row: parseInt(e.target.dataset.row, 10),
-                cell: e.target.cellIndex,
+                key: e.target.key,
             }
         });
     }
 
-    _sort(e) {
-        const column = e.target.cellIndex;
-        const descending = this.state.sortby === column && !this.state.descending;
+    _sort(key) {
+        // const column = e.target.cellIndex;
+        // const descending = this.state.sortby === column && !this.state.descending;
         // console.log('this.state.sortby',this.state.sortby)
         // console.log('column', column)
         // console.log('this.state.descending', this.state.descending);
         // console.log('descending', descending)
         // const data = this.state.data.slice();
         const data = Array.from(this.state.data);
+        const descending = this.state.sortby === key
+            && !this.state.descending;
         // const data = [...this.state.data];
         data.sort((a, b) => {
             return descending
-                ? (a[column] < b[column] ? 1 : -1)
-                : (a[column] > b[column] ? 1 : -1);
+                ? (a[key] < b[key] ? 1 : -1)
+                : (a[key] > b[key] ? 1 : -1);
 
         });
-        this._logSetState({
+        this.setState({
             data: data,
-            sortby: column,
+            sortby: key,
             descending: descending,
         });
+        this._fireDataChange(data);
     }
 
     _save(e) {
         e.preventDefault();
-        const input = e.target.closest('form').querySelector('input');
-        const data = this.state.data.slice();
+        // const input = e.target.closest('form').querySelector('input');
+        // const data = this.state.data.slice();
         // console.log(input)
         // console.log('input.value',input.value)
         // console.log('data', data)
         // console.log('this.state.edit.row', this.state.edit.row)
         // console.log('this.state.edit.cell',this.state.edit.cell)
         // console.log('data_change', data[this.state.edit.row][this.state.edit.cell])
-        data[this.state.edit.row][this.state.edit.cell] = input.value;
+        const value = this.refs.input.getValue();
+        let data = Array.from(this.state.data);
+        data[this.state.edit.row][this.state.edit.key] =value;
         this._logSetState({
             edit: null,
             data: data,
         });
+        this._fireDataChange(data);
+    }
+
+    _actionClick(rowidx, action) {
+        this.setState({dialog: {type: action, idx: rowidx}});
+    }
+
+    _deleteConfirmationClick(action) {
+        if (action === 'dismiss') {
+            this._closeDialog();
+            return;
+        }
+        let data = Array.from(this.state.data);
+        data.splice(this.state.dialog.idx, 1);
+        this.setState({
+            dialog: null,
+            data: data,
+        });
+    }
+
+    _closeDialog() {
+        this.setState({dialog: null});
+    }
+
+    _saveDataDialog(action) {
+        if (action === 'dismiss') {
+            this._closeDialog();
+            return;
+        }
+        let data = Array.from(this.state.data);
+        data[this.state.dialog.idx] = this.refs.form.getData();
+        this.setState({
+            dialog: null,
+            data: data,
+        });
+        this._fireDataChange(data);
     }
 
     _renderSearch() {
@@ -178,7 +240,7 @@ class Tbody extends Component {
 
     _renderToolbar() {
         return(
-            <div>
+            <div className={'toolbar'}>
                 <button
                     onClick={this._toggleSearch}
                     className={'toolbar'}
@@ -231,22 +293,73 @@ class Tbody extends Component {
             </table>
         );
     }
+
+    _renderDialog() {
+        if (!this.state.dialog) {
+            return null;
+        }
+        switch (this.state.dialog.type) {
+        case 'delete':
+            return this._renderDeleteDialog();
+        case 'info':
+            return this._renderFormDialog(true);
+        default:
+            throw Error(`Unexpected dialog type ${this.state.dialog.type}`);
+        }
+    }
+
+    _renderDeleteDialog() {
+        const first = this.state.data[this.state.dialog.idx];
+        const nameguess = first[Object.keys(first[0])];
+        return (
+            <Dialog
+                modal={true}
+                header={'Confirm deletion'}
+                confimLable = 'Delete'
+                onAction={ this._deleteConfirmationClick.bind(this)}
+            >
+                {`Are you sure you want to delete ${nameguess}?`}
+            </Dialog>
+        );
+    }
+
+    _renderFromDialog(readonly) {
+        return (
+            <Dialog
+                modal={true}
+                header={readonly ? 'Item info' : 'Edit item'}
+                confirmLabel={readonly ? 'ok' : 'Save'}
+                hasCancel={!readonly}
+                onAction={this._saveDataDialog.bind(this)}
+            >
+                <Form
+                    ref={'form'}
+                    fields={this.props.schema}
+                    initialData={this.state.data[this.state.dialog.idx]}
+                    readonly={readonly}
+                />
+            </Dialog>
+        );
+    }
+
     render() {
         return(
             <div>
-                {this._renderToolbar()}
                 {this._renderTable()}
+                {this._renderDialog()}
             </div>
         );
     }
 }
 
 Tbody.propTypes = {
+    schema: PropType.arrayOf(
+        PropType.object
+    ),
     initialData: PropType.arrayOf(
-        PropType.arrayOf(
-            PropType.string
-        )
-    )
+        PropType.object
+    ),
+    onDataChange: PropType.func,
 };
 
 export default Tbody;
