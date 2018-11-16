@@ -1,17 +1,17 @@
 import React, {Component} from 'react';
 import exelCss from './excel.css';
 import Thead from './Thead';
-import datafile from '../data';
+// import datafile from '../data';
 import Tbody from './Tbody';
 import Fancylink from './FancyLink';
 
 let headers = localStorage.getItem('headers');
-let data = localStorage.getItem('data');
-
-if(!headers) {
-    headers = datafile.headers;
-    data = datafile.data;
-}
+// let data = localStorage.getItem('data');
+//
+// if(!headers) {
+//     headers = datafile.headers;
+//     data = datafile.data;
+// }
 
 
 
@@ -21,6 +21,7 @@ class Excel extends Component {
     constructor(props) {
         super(props);
         //this.state = this.handle
+        console.log(this)
     }
 
     getCellIndex(e) {
@@ -38,7 +39,11 @@ class Excel extends Component {
         // console.log('Excel', this);
         return (
             <div className={'Excel'}>
-                <Tbody initialData={data} headers={headers}/>
+                <Tbody
+                    initialData={this.props.initialData}
+                    schema={this.props.schema}
+                    onDataChange={this.props.onDataChange}
+                />
             </div>
         );
     }

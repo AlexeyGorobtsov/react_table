@@ -51,7 +51,9 @@ class Dialog extends Component {
                                 ? 'confirm'
                                 : 'dismiss'
                             )}
-                        />
+                        >
+                            {this.props.confirmLabel}
+                        </Button>
                     </div>
                 </div>
             </div>

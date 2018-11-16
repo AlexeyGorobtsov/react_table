@@ -11,7 +11,7 @@ class Suggest extends Component {
     }
 
     render() {
-        const randomid = Math.random().toString(16).substing(2);
+        const randomid = Math.random().toString(16).substring(2);
         return (
             <div>
                 <input

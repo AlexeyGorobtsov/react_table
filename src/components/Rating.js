@@ -26,7 +26,7 @@ class Rating extends Component {
         });
     }
 
-    resetI() {
+    reset() {
         this.setTemp(this.state.rating);
     }
 
@@ -49,10 +49,11 @@ class Rating extends Component {
                     onMouseOver={!this.props.readonly
                                     && this.setTemp.bind(this, i)}
                 >
-                    &#9734
+                    &#9734;
                 </span>
             );
         }
+        console.log(this)
         return (
             <div
                 className={classNames({

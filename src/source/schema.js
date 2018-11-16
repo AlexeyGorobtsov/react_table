@@ -1,4 +1,4 @@
-import cassification from './classification';
+import cassification from './classifaction';
 
 export default [
     {
@@ -23,6 +23,13 @@ export default [
         show: true,
         sample: 'Merlot',
         align: 'left',
+    },
+    {
+        id: 'rating',
+        label: 'Rating',
+        type: 'rating',
+        show: true,
+        sample: 3
     },
     {
         id: 'comments',

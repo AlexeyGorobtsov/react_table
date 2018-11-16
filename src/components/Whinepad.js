@@ -4,6 +4,7 @@ import Dialog from './Dialog';
 import Excel from '../excel/Excel';
 import Form from './Form';
 import PropTypes from 'prop-types';
+//import Tbody from '../excel/Tbody'
 
 class Whinepad extends Component {
     constructor(props) {
@@ -14,6 +15,8 @@ class Whinepad extends Component {
             addnew: false,
         };
         this._preSearchData = null;
+
+        console.log(this)
     }
 
     _addnewDialog() {
@@ -49,6 +52,12 @@ class Whinepad extends Component {
         });
     }
 
+    _doneSearching() {
+        this.setState({
+            data: this._preSearchData,
+        });
+    }
+
     _search(e) {
         const needle = e.target.value.toLowerCase();
         if(!needle) {
@@ -74,7 +83,7 @@ class Whinepad extends Component {
                 <div className={'WhinepadToolbar'}>
                     <div className={'WhinepadToolbarAdd'}>
                         <Button
-                            onClick={this._addnewDialog().bind(this)}
+                            onClick={this._addnewDialog.bind(this)}
                             className={'WhinepadToolbarAddButton'}
                         >
                             + add

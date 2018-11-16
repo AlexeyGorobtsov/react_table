@@ -8,6 +8,7 @@ import classNames from 'classnames';
 import PropType from 'prop-types';
 import Thead from './Thead';
 import datafile from '../data';
+import schema from '../source/schema';
 const {headers, data} = datafile;
 
 class Tbody extends Component {
@@ -31,15 +32,6 @@ class Tbody extends Component {
         };
         console.log(this);
     }
-    // getInitialState() {
-    //     return {
-    //         data: this.props.initialData,
-    //         sortby: null,
-    //         descending: false,
-    //         edit: null,
-    //         search: false,
-    //     };
-    // }
 
     componentWillReceiveProps(nextProps) {
         this.setState({ data: nextProps.initialData});
@@ -265,30 +257,71 @@ class Tbody extends Component {
     _renderTable() {
         return(
             <table>
-                <Thead headers = {headers}
+                <Thead
+                    schema={this.props.schema}
+                    headers = {headers}
                     sort = {this._sort}
                     descending = {this.state.descending}
                     sortby = {this.state.sortby}
+                    _sort={this._sort.bind(this)}
                 />
                 <tbody onDoubleClick={this._showEditor}>
-                    {this._renderSearch()}
-                    {this.state.data.map((row, i) =>
-                        <tr key={i}>
-                            {row.map((cell, ind) => {
-                                let content = cell;
-
-                                const edit = this.state.edit;
-                                if (edit && edit.row === i && edit.cell === ind ) {
-                                    content = <form>
-                                        <input defaultValue={content} />
-                                        <button onClick={this._save}>Save</button>
-                                    </form>;
-                                }
-                                return <td key={ind} data-row={i}>{cell, content}</td>;
-                            })
-                            }
-                        </tr>
-                    )}
+                    {this.state.data.map((row, rowidx) => {
+                        return (
+                            <tr key={rowidx}>{
+                                Object.keys(row).map((cell, idx) => {
+                                    const schema = this.props.schema[idx];
+                                    if (!schema || !schema.show) {
+                                        return null;
+                                    }
+                                    const isRating = schema.type === 'rating';
+                                    const edit = this.state.edit;
+                                    let content = row[cell];
+                                    //console.log(row)
+                                    //console.log('content', content)
+                                    if (!isRating && edit && edit.row === rowidx && edit.key === schema.id) {
+                                        content = (
+                                            <form
+                                                onSubmit={this._save}
+                                            >
+                                                <FormInput
+                                                    ref={'input'} {...schema}
+                                                    defaultValue={content}
+                                                />
+                                            </form>
+                                        );
+                                    } else if (isRating) {
+                                        //console.log('number', (content))
+                                        content = <Rating
+                                            readonly={true}
+                                            defaultValue={Number(content)}
+                                        />;
+                                    }
+                                    return (
+                                        <td
+                                            className={classNames({
+                                                [`schema=${schema.id}`]: true,
+                                                'ExcelEditable': !isRating,
+                                                'ExcelDataLeft': schema.align === 'left',
+                                                'ExcelDataRight': schema.align === 'right',
+                                                'ExcelDataCenter': schema.align !== 'left' && schema.aligh !== 'right',
+                                            })}
+                                            key={idx}
+                                            data-row={rowidx}
+                                            data-key={schema.id}
+                                        >
+                                            {content}
+                                        </td>
+                                    );
+                                }, this)}
+                            <td className={'ExcelDataCenter'}>
+                                <Actions
+                                    onAction={this._actionClick.bind(this, rowidx)}
+                                />
+                            </td>
+                            </tr>
+                        );
+                    }, this)}
                 </tbody>
             </table>
         );
@@ -303,6 +336,8 @@ class Tbody extends Component {
             return this._renderDeleteDialog();
         case 'info':
             return this._renderFormDialog(true);
+        case 'edit':
+            return this._renderFormDialog();
         default:
             throw Error(`Unexpected dialog type ${this.state.dialog.type}`);
         }
@@ -323,7 +358,8 @@ class Tbody extends Component {
         );
     }
 
-    _renderFromDialog(readonly) {
+    _renderFormDialog(readonly) {
+        // console.log(this.state)
         return (
             <Dialog
                 modal={true}
