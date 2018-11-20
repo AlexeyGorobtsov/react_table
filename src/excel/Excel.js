@@ -21,7 +21,6 @@ class Excel extends Component {
     constructor(props) {
         super(props);
         //this.state = this.handle
-        console.log(this)
     }
 
     getCellIndex(e) {

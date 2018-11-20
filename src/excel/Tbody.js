@@ -275,7 +275,9 @@ class Tbody extends Component {
                                         return null;
                                     }
                                     const isRating = schema.type === 'rating';
+                                    //  console.log(isRating)
                                     const edit = this.state.edit;
+                                    console.log(row[cell])
                                     let content = row[cell];
                                     //console.log(row)
                                     //console.log('content', content)
@@ -295,8 +297,10 @@ class Tbody extends Component {
                                         content = <Rating
                                             readonly={true}
                                             defaultValue={Number(content)}
+                                            maxRating={Number(5)}
                                         />;
                                     }
+                                    {console.log(content)}
                                     return (
                                         <td
                                             className={classNames({

@@ -16,10 +16,10 @@ class Whinepad extends Component {
         };
         this._preSearchData = null;
 
-        console.log(this)
+        console.log(this);
     }
 
-    _addnewDialog() {
+    _addNewDialog() {
         this.setState({addnew: true});
     }
 
@@ -47,32 +47,22 @@ class Whinepad extends Component {
     }
 
     _startSearching() {
-        this.setState({
-            data: this._preSearchData,
-        });
-    }
-
-    _doneSearching() {
-        this.setState({
-            data: this._preSearchData,
-        });
+        this._preSearchData = Array.from(this.state.data);
     }
 
     _search(e) {
         const needle = e.target.value.toLowerCase();
         if(!needle) {
-            this.setState({data: this._preSearchData});
+            this.setState({data: this.props.initialData});
             return;
         }
-        const fields = this.props.schema.map(item => item.id);
+        // console.log(this._preSearchData)
         const searchdata = this._preSearchData.filter(row => {
-            for (let f = 0; f < fields.length; f++) {
-                if (row[fields[f]].toString().toLowerCase()
-                    .indexOf(needle) > -1) {
+            if (typeof row === 'object') {
+                if (Object.values(row).join('').toLowerCase().indexOf(needle) > -1) {
                     return true;
                 }
             }
-            return false;
         });
         this.setState({data: searchdata});
     }
@@ -83,7 +73,7 @@ class Whinepad extends Component {
                 <div className={'WhinepadToolbar'}>
                     <div className={'WhinepadToolbarAdd'}>
                         <Button
-                            onClick={this._addnewDialog.bind(this)}
+                            onClick={this._addNewDialog.bind(this)}
                             className={'WhinepadToolbarAddButton'}
                         >
                             + add
@@ -96,7 +86,7 @@ class Whinepad extends Component {
                             placeholder={'Search...'}
                             onChange={this._search.bind(this)}
                             onFocus={this._startSearching.bind(this)}
-                            onBlur={this._doneSearching.bind(this)}
+
                         />
                     </div>
                 </div>
@@ -118,7 +108,7 @@ class Whinepad extends Component {
                     >
                         <Form
                             ref={'form'}
-                            fields={this.props.scheme}/>
+                            fields={this.props.schema}/>
                     </Dialog>
                     : null
                 }

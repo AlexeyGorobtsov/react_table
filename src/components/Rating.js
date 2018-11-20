@@ -9,6 +9,8 @@ class Rating extends Component {
             rating: props.defaultValue,
             tmpRating: props.defaultValue,
         };
+
+        console.log(this)
     }
 
     getValue() {
@@ -36,7 +38,7 @@ class Rating extends Component {
 
     render() {
         const stars = [];
-        for (let i = 1; i <= this.props.max; i++) {
+        for (let i = 1; i <= this.props.defaultValue; i++) {
             stars.push(
                 <span
                     className={i <= this.state.tmpRating
@@ -53,7 +55,7 @@ class Rating extends Component {
                 </span>
             );
         }
-        console.log(this)
+        //console.log(stars)
         return (
             <div
                 className={classNames({
