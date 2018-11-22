@@ -5,6 +5,7 @@ import Excel from '../excel/Excel';
 import Form from './Form';
 import PropTypes from 'prop-types';
 //import Tbody from '../excel/Tbody'
+import '../css/whinepad.css';
 
 class Whinepad extends Component {
     constructor(props) {

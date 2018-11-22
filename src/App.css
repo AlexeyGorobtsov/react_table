@@ -1,4 +1,24 @@
 html {
-  background: #fff;
+  background-color: #f0f0f0;
   font: 16px Arial;
+}
+
+body {
+  margin: 0;
+}
+
+input, textarea {
+  font-size: 14px;
+  padding: 10px;
+}
+
+.app-header {
+  background-color: #6f001b;
+  color: #f0f0f0;
+  font-family: 'Norican', cursive;
+  font-size: 46px;
+  font-weight: 900;
+  margin: 0;
+  padding: 20px 20px 20px 14px;
+  vertical-align: middle;
 }

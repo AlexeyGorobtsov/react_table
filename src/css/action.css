@@ -1,0 +1,33 @@
+.Actions span {
+    border-radius: 150%;
+    border: 2px solid black;
+    color: #000;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+    height: 25px;
+    margin: 5px 15px 5px 15px;
+    padding-top: 6px;
+    text-align: center;
+    transition-duration: .1s;
+    -webkit-transition-property: transform;
+    -moz-transition-property: transform;
+    -ms-transition-property: transform;
+    -o-transition-property: transform;
+    transition-property: transform;
+    width: 33px;
+}
+
+.Actions span:hover {
+    transform: scale(1.1);
+}
+
+.Actions .ActionsInfo {
+    border-color: #3498db;
+    color: #3498db;
+}
+
+.Actions .ActionsDelete {
+    border-color: #b7477d;
+    color: #b7477d;
+}

@@ -4,6 +4,7 @@ import Thead from './Thead';
 // import datafile from '../data';
 import Tbody from './Tbody';
 import Fancylink from './FancyLink';
+import '../css/excel.css'
 
 let headers = localStorage.getItem('headers');
 // let data = localStorage.getItem('data');

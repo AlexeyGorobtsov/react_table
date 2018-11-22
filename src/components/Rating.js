@@ -1,15 +1,23 @@
 import classNames from 'classnames';
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
+import '../css/rating.css';
 
 class Rating extends Component {
+
+    static defaultProps = {
+        defaultValue: 0,
+        max: 5,
+        readonly: false
+    };
+
     constructor(props) {
         super(props);
+
         this.state = {
             rating: props.defaultValue,
             tmpRating: props.defaultValue,
         };
-
         console.log(this)
     }
 
@@ -38,18 +46,25 @@ class Rating extends Component {
 
     render() {
         const stars = [];
-        for (let i = 1; i <= this.props.defaultValue; i++) {
+        for (let i = 1; i <= this.props.max; i++) {
             stars.push(
                 <span
                     className={i <= this.state.tmpRating
                         ? 'RatingOn'
-                        : null
+                        : undefined
                     }
                     key={i}
-                    onClick={!this.props.readonly
-                                && this.setRating.bind(this, i)}
-                    onMouseOver={!this.props.readonly
-                                    && this.setTemp.bind(this, i)}
+
+                    onClick={
+                        !this.props.readonly
+                                ? this.setRating.bind(this, i)
+                                : undefined
+                    }
+                    onMouseOver={
+                        !this.props.readonly
+                            ? this.setTemp.bind(this, i)
+                            : undefined
+                    }
                 >
                     &#9734;
                 </span>
@@ -66,11 +81,11 @@ class Rating extends Component {
             >
                 {stars}
                 {this.props.readonly || !this.props.id
-                    ? null
+                    ? false
                     : <input
                         type={'hidden'}
-                        id={this.props.id}
-                        value={this.state.rating}
+                        id={this.props.id.toString()}
+                        value={this.state.rating.toString()}
                     />
                 }
             </div>

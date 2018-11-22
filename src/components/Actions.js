@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 
+import '../css/action.css';
+
 import PropTypes from 'prop-types';
+import '../css/action.css';
 
 const Actions = props =>
     <div className={'Actions'}>

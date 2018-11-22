@@ -21,9 +21,12 @@ class App extends Component {
 
     render() {
         return (
-            <div className={'app-header'}>
-                <Title name={'Bob'}/>
-                <TextAreaCounter />
+            <div>
+                <div className={'app-header'}>
+                    {/*<Title name={'Bob'}/>*/}
+                    <TextAreaCounter />
+                    Welcom to Winepad!
+                </div>
                 <Whinepad schema={schema} initialData={data} />
             </div>
         );
